@@ -11,7 +11,7 @@ class Student(models.Model):
 
 class Picture(models.Model):
     #data = models.BinaryField()
-    file = models.ImageField(upload_to="picture/%Y/%m/%d")
+    file = models.ImageField(upload_to="picture/%Y/%m/%d", max_length=150)
     title = models.CharField(max_length=50)
 
     def __str__(self):
@@ -23,4 +23,7 @@ class Project(models.Model):
     description = models.TextField()
     members = models.ManyToManyField(Student)
     #picture_cover = models.ForeignKey(Picture, null=True)
-    pictures = models.ManyToManyField(Picture)
+    pictures = models.ManyToManyField(Picture, blank=True)
+
+    def __str__(self):
+        return self.name
