@@ -1,0 +1,40 @@
+{% load get_range %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<h1>{{ project.name }}</h1>
+{{ project.description }}
+<h2>Members</h2>
+<ul>
+{% for member in project.members.all %}
+    <li>{{ member.login }}</li>
+{% endfor %}
+</ul>
+<h2>Photos</h2>
+<ul>
+{% for picture in project.pictures.all %}
+    <li>{{ picture.title }}<br /> <img width="500" src="/media/{{ picture.file }}" alt="{{ picture.title }}" /></li>
+{% endfor %}
+</ul>
+<h2>Mark the project</h2>
+{% for question in questions %}
+<h3>{{ question.title }}</h3>
+<p>{{  question.detail }}</p>
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+<form action="{% url 'marks:grade' project.id %}" method="post">
+{% csrf_token %}
+<div class="rate">
+    {% for i in 10|get_range %}
+    {% if not i == 0 and not i = 5 %}
+        <input type="radio" name="question-{{ question.id }}" value="{{ i }}"> {{ i }}<br>
+    {% endif %}
+    {% endfor %}
+</div>
+{% endfor %}
+<input type="submit" value="Vote" />
+</form>
+</body>
+</html>

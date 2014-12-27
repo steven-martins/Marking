@@ -25,5 +25,23 @@ class Project(models.Model):
     #picture_cover = models.ForeignKey(Picture, null=True)
     pictures = models.ManyToManyField(Picture, blank=True)
 
+    marks = models.ManyToManyField(Student, through='Mark', related_name="project_marks_student")
+
     def __str__(self):
         return self.name
+
+class Question(models.Model):
+    title = models.CharField(max_length=200)
+    detail = models.CharField(max_length=250, blank=True)
+
+    def __str__(self):
+        return self.title
+
+class Mark(models.Model):
+    student = models.ForeignKey(Student)
+    project = models.ForeignKey(Project)
+    question = models.ForeignKey(Question)
+    result = models.IntegerField()
+
+    def __str__(self):
+        return "Mark(%s) by %s for %s" % (self.result, self.student, self.question)

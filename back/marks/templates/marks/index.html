@@ -7,7 +7,7 @@
 {% if list %}
     <ul>
     {% for project in list %}
-        <li><a href="/marks/{{ project.id }}/">{{ project.name }}</a></li>
+        <li><a href="{% url 'marks:detail' project.id %}">{{ project.name }}</a></li>
     {% endfor %}
     </ul>
 {% else %}

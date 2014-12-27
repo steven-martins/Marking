@@ -12,6 +12,6 @@ urlpatterns = [
     # ex: /polls/5/results/
     url(r'^(?P<project_id>[0-9]+)/results/$', views.results, name='results'),
     # ex: /polls/5/mark/
-    url(r'^(?P<project_id>[0-9]+)/mark/$', views.mark, name='vote'),
+    url(r'^(?P<project_id>[0-9]+)/mark/$', views.mark, name='grade'),
 ]
 
