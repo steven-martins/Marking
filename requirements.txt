@@ -1,0 +1,5 @@
+Django==1.7
+mysql-connector-python==1.2.3
+django-redis==3.7.1
+jsonfield==1.0.0
+Pillow==2.6.1
