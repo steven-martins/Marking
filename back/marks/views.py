@@ -39,16 +39,8 @@ def mark(request, project_id):
             #    pass
             except Mark.DoesNotExist:
                 mark = Mark(student=stud, project=p, question=quest)
-                # Redisplay the question voting form.
-                #return render(request, 'polls/detail.html', {
-                #    'question': p,
-                #    'error_message': "You didn't select a choice.",
-                #})
             finally:
                 mark.result = int(value)
                 mark.save()
-    # Always return an HttpResponseRedirect after successfully dealing
-    # with POST data. This prevents data from being posted twice if a
-    # user hits the Back button.
     return HttpResponseRedirect(reverse('marks:results', args=(p.id,)))
 
