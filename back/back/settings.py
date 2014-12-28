@@ -108,5 +108,8 @@ STATICFILES_FINDERS = (
 )
 
 TEMPLATE_DIRS = (
+    './back/templates/',
     '../marks/templates/',
 )
+
+LOGIN_URL = '/accounts/login/'

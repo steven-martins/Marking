@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title></title>
-</head>
-<body>
+
+{% extends "skel.html" %}
+
+{% block content %}
 {% if list %}
     <ul>
     {% for project in list %}
@@ -13,5 +11,5 @@
 {% else %}
     <p>No project are available.</p>
 {% endif %}
-</body>
-</html>
+
+{% endblock  %}
