@@ -1,16 +1,37 @@
 
 {% extends "skel.html" %}
 
+
 {% block content %}
-{% if list %}
-    <ul>
-    {% for project in list %}
-        <li><a href="{% url 'marks:detail' project.id %}">{{ project.name }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No project are available.</p>
-{% endif %}
+
+<h3><i class="fa fa-angle-right"></i> Projects</h3>
+
+
+<div class="row mt">
+    <div class="col-md-12">
+        <div class="white-panel pn">
+            <div class="panel-heading">
+                <div class="pull-left"><h4><i class="fa fa-tasks"></i> All projects</h4></div>
+                <br>
+            </div>
+             <div class="panel-body">
+                {% if list %}
+                <ul>
+                {% for project in list %}
+                    <li  class="list-primary">
+                        <a href="{% url 'marks:detail' project.id %}">{{ project.name }}</a>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>No project available.</p>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <h2>My projects:</h2>
 {% if my_projects %}
