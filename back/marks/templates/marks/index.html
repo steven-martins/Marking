@@ -12,4 +12,15 @@
     <p>No project are available.</p>
 {% endif %}
 
+<h2>My projects:</h2>
+{% if my_projects %}
+    <ul>
+    {% for project in my_projects %}
+        <li><a href="{% url 'marks:detail' project.id %}">{{ project.name }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No project are available.</p>
+{% endif %}
+
 {% endblock  %}

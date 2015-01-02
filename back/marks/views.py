@@ -6,44 +6,95 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth import logout
 
 
-from .models import Project, Question, Mark, Student
-
+from .models import Project, Question, Mark, Picture
+from .forms import PictureForm, ProjectForm
 # Create your views here.
 
 
 def index(request):
-    list = Project.objects.all()
-    context = {'list': list}
+    list = []
+    my_projects = []
+    if request.user.is_authenticated():
+        list = Project.objects.all()
+        my_projects = Project.objects.filter(members=request.user)
+
+    context = {'list': list, 'my_projects': my_projects}
     return render(request, 'marks/index.html', context)
 
 
 @login_required
 def detail(request, project_id):
+
     project = get_object_or_404(Project, pk=project_id)
-    questions = get_list_or_404(Question)
-    context = {'project': project, 'questions': questions}
+    questions_raw = Question.objects.all()
+    marks = Mark.objects.filter(student=request.user, project=project)
+    questions = []
+    for q in questions_raw:
+        value = None
+        for m in marks:
+            if q.pk == m.question.pk:
+                value = m.result
+        questions.append((q, value))
+
+    shared_timeslot = False
+    for proj in Project.objects.filter(members=request.user):
+        if not shared_timeslot and project.timeslot == proj.timeslot:
+            shared_timeslot = True
+    context = {'project': project, 'questions': questions, "shared_timeslot": shared_timeslot}
     return render(request, 'marks/project.html', context)
 
-def results(request, project_id):
 
-    return HttpResponse("Results for %s. You are: %s" % (project_id, request.user))
+@login_required
+def editsec(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    if request.method == 'POST':
 
+        form = ProjectForm(request.POST, request.FILES)
+        if form.is_valid():
+            pict = form.save()
+            project.pictures.add(pict)
+            #instance = Picture(file=request.FILES['file'])
+            #instance.set_title(form.title)
+            #instance.save()
+            return HttpResponseRedirect(reverse('marks:detail', args=(project.id,)))
+    else:
+        form = ProjectForm(instance=project)
+    return render(request, 'marks/edit.html', {'form': form, 'project':project})
+
+
+@login_required
+def edit(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    if request.method == 'POST':
+
+        form = PictureForm(request.POST, request.FILES)
+        if form.is_valid():
+            pict = form.save()
+            project.pictures.add(pict)
+            #instance = Picture(file=request.FILES['file'])
+            #instance.set_title(form.title)
+            #instance.save()
+            return HttpResponseRedirect(reverse('marks:detail', args=(project.id,)))
+    else:
+        form = PictureForm()
+    return render(request, 'marks/edit.html', {'form': form, 'project':project})
+
+@login_required
 def mark(request, project_id):
     #grade
     p = get_object_or_404(Project, pk=project_id)
-    stud = Student.objects.get(login="mart_s")
 
     for key, value in request.POST.items():
         if key.startswith("question-"):
             try:
                 quest = Question.objects.get(pk=int(key[9:]))
-                mark = Mark.objects.get(student=stud, project=p, question=quest)
+                ma = Mark.objects.get(student=request.user, project=p, question=quest)
                 #selected_choice = p.choice_set.get(pk=request.POST['choice'])
             #except Question.DoesNotExist:
             #    pass
             except Mark.DoesNotExist:
-                mark = Mark(student=stud, project=p, question=quest)
+                ma = Mark(student=request.user, project=p, question=quest)
             finally:
-                mark.result = int(value)
-                mark.save()
-    return HttpResponseRedirect(reverse('marks:results', args=(p.id,)))
+                ma.result = int(value)
+                ma.save()
+    return HttpResponseRedirect(reverse('marks:detail', args=(p.id,)))

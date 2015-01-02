@@ -99,7 +99,7 @@ MEDIA_ROOT = 'C:/Users/Steven/Dropbox/Projects/Marking/files/'
 MEDIA_URL = '/media/'
 
 STATICFILES_DIRS = (
-    "../files/",
+    "../static/",
 )
 
 STATICFILES_FINDERS = (
@@ -113,3 +113,9 @@ TEMPLATE_DIRS = (
 )
 
 LOGIN_URL = '/accounts/login/'
+
+LOGIN_REDIRECT_URL = '/marks/'
+
+AUTHENTICATION_BACKENDS = ('auth.blow.Auth', 'django.contrib.auth.backends.ModelBackend')
+
+PASSWORD_FILE = os.path.join(BASE_DIR, '../master.passwd.blowfish')

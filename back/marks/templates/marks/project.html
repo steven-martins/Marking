@@ -1,16 +1,14 @@
+{% extends "skel.html" %}
+
+{% block content %}
+
 {% load get_range %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title></title>
-</head>
-<body>
 <h1>{{ project.name }}</h1>
 {{ project.description }}
 <h2>Members</h2>
 <ul>
 {% for member in project.members.all %}
-    <li>{{ member.login }}</li>
+    <li><img src="https://cdn.local.epitech.eu/userprofil/trombiview/{{ member.username }}.jpg"><br/>{{ member.username }}</li>
 {% endfor %}
 </ul>
 <h2>Photos</h2>
@@ -19,8 +17,10 @@
     <li>{{ picture.title }}<br /> <img width="500" src="/media/{{ picture.file }}" alt="{{ picture.title }}" /></li>
 {% endfor %}
 </ul>
+{% if not user in project.members.all %}
+{% if shared_timeslot %}
 <h2>Mark the project</h2>
-{% for question in questions %}
+{% for question, value in questions %}
 <h3>{{ question.title }}</h3>
 <p>{{  question.detail }}</p>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
@@ -29,12 +29,19 @@
 <div class="rate">
     {% for i in 10|get_range %}
     {% if not i == 0 and not i = 5 %}
-        <input type="radio" name="question-{{ question.id }}" value="{{ i }}"> {{ i }}<br>
+        <input type="radio" {% if value == i %}checked{% endif %} name="question-{{ question.id }}" value="{{ i }}"> {{ i }}<br>
     {% endif %}
     {% endfor %}
 </div>
 {% endfor %}
 <input type="submit" value="Vote" />
 </form>
-</body>
-</html>
+{% else %}
+        <p>
+            You are not sharing the same timeslot with this group. So you cannot mark it.
+        </p>
+{% endif %}
+{% else %}
+<h2>~~Edit my project~~</h2>
+{% endif %}
+{% endblock %}

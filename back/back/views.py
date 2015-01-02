@@ -8,7 +8,8 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth import logout
 
 
-
+def index(request):
+    return HttpResponseRedirect(reverse('marks:index'))
 
 def logout_view(request):
     logout(request)

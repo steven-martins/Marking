@@ -1,13 +1,5 @@
 from django.db import models
-from datetime import datetime
-
-class Student(models.Model):
-    login = models.CharField(max_length=10, primary_key=True)
-    last_connection = models.DateTimeField(default=datetime.now, blank=True)
-
-    def __str__(self):
-        return self.login
-
+from django.contrib.auth.models import User
 
 class Picture(models.Model):
     #data = models.BinaryField()
@@ -17,15 +9,22 @@ class Picture(models.Model):
     def __str__(self):
         return "%s - %s " % (self.title, str(self.file))
 
-# Create your models here.
+class Timeslot(models.Model):
+    title = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.title
+
+
 class Project(models.Model):
+
     name = models.CharField(max_length=100)
     description = models.TextField()
-    members = models.ManyToManyField(Student)
+    members = models.ManyToManyField(User)
     #picture_cover = models.ForeignKey(Picture, null=True)
     pictures = models.ManyToManyField(Picture, blank=True)
-
-    marks = models.ManyToManyField(Student, through='Mark', related_name="project_marks_student")
+    timeslot = models.ForeignKey(Timeslot, blank=True)
+    marks = models.ManyToManyField(User, through='Mark', related_name="project_marks_student")
 
     def __str__(self):
         return self.name
@@ -38,7 +37,7 @@ class Question(models.Model):
         return self.title
 
 class Mark(models.Model):
-    student = models.ForeignKey(Student)
+    student = models.ForeignKey(User)
     project = models.ForeignKey(Project)
     question = models.ForeignKey(Question)
     result = models.IntegerField()
