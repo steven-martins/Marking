@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+import datetime
+
 class Picture(models.Model):
     #data = models.BinaryField()
     file = models.ImageField(upload_to="picture/%Y/%m/%d", max_length=150)
@@ -41,6 +43,15 @@ class Mark(models.Model):
     project = models.ForeignKey(Project)
     question = models.ForeignKey(Question)
     result = models.IntegerField()
+    created     = models.DateTimeField(editable=False)
+    modified    = models.DateTimeField()
 
     def __str__(self):
         return "Mark(%s) by %s for %s" % (self.result, self.student, self.question)
+
+    def save(self, *args, **kwargs):
+        ''' On save, update timestamps '''
+        if not self.id:
+            self.created = datetime.datetime.today()
+        self.modified = datetime.datetime.today()
+        return super(Mark, self).save(*args, **kwargs)
