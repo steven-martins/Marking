@@ -83,19 +83,20 @@
     <div class="col-md-12">
         <div class="form-panel">
             <div class="">
-                <h3 class="mb">Rate the project</h3>
+                <h3 class="mb">Mark the project</h3>
                 <br>
             </div>
             <div class="panel-body">
                 {% if shared_timeslot %}
+                {% if entirely_marked %}
+                    <div class="alert alert-success"><b>Congrats, You have successfully marked this project.</b></div>
+                {% endif %}
                 <form action="{% url 'marks:grade' project.id %}" method="post">
                     {% csrf_token %}
                     {% if error_message %}
                     <div class="alert alert-danger"><b>{{ error_message }}</b></div>
                     {% endif %}
-                    {% if success_message %}
-                    <div class="alert alert-success"><b>{{ success_message }}</b></div>
-                    {% endif %}
+
                     {% for question, value in questions %}
                     <h4>{{ question.title }}</h4>
                     <p>{{  question.detail }}</p>

@@ -38,17 +38,21 @@ def detail(request, project_id):
     questions_raw = Question.objects.all()
     marks = Mark.objects.filter(student=request.user, project=project)
     questions = []
+    entirely_marked = True
     for q in questions_raw:
         value = None
         for m in marks:
             if q.pk == m.question.pk:
                 value = m.result
+        if entirely_marked and not value:
+            entirely_marked = False
         questions.append((q, value))
     shared_timeslot = False
     for proj in Project.objects.filter(members=request.user):
         if not shared_timeslot and project.timeslot == proj.timeslot:
             shared_timeslot = True
-    context = {'project': project, 'questions': questions, "shared_timeslot": shared_timeslot}
+    context = {'project': project, 'questions': questions, "shared_timeslot": shared_timeslot,
+               'entirely_marked': entirely_marked}
     return render(request, 'marks/project.html', context)
 
 @login_required
