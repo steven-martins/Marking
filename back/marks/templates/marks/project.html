@@ -13,7 +13,7 @@
                 <br>
             </div>
             <div class="panel-body">
-                {{ project.description }}
+                {{ project.description|linebreaks }}
             </div>
         </div>
     </div>
@@ -89,6 +89,7 @@
             <div class="panel-body">
                 {% if shared_timeslot %}
                 <form action="{% url 'marks:grade' project.id %}" method="post">
+                    {% csrf_token %}
                     {% if error_message %}
                     <div class="alert alert-danger"><b>{{ error_message }}</b></div>
                     {% endif %}
@@ -98,7 +99,6 @@
                     {% for question, value in questions %}
                     <h4>{{ question.title }}</h4>
                     <p>{{  question.detail }}</p>
-                    {% csrf_token %}
                     {% for i in 10|get_range %}
                     {% if not i == 0 and not i = 5 %}
                     <label class="checkbox-inline">
@@ -124,11 +124,11 @@
     <div class="col-md-12">
         <div class="form-panel">
             <div class="">
-                <h3 class="mb">Edit</h3>
+                <h3 class="mb"><i class="fa fa-edit"></i> Edit</h3>
                 <br>
             </div>
             <div class="panel-body">
-                <form action="{% url 'marks:editsec' project.id %}" method="post" enctype="multipart/form-data">
+                <form class="form-horizontal style-form" action="{% url 'marks:editsec' project.id %}" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <form class="form-horizontal">
                         {% if form.errors %}
@@ -161,5 +161,69 @@
         </div>
     </div>
 </div>
+<div class="row mt">
+    <div class="col-md-12">
+        <section class="task-panel tasks-widget">
+            <div class="panel-heading">
+                <div class=""><h3><i class="fa fa-camera"></i> Manage Photos</h3></div>
+                <br>
+            </div>
+            <div class="panel-body">
+                <div class="task-content">
+                    {% if project.pictures.all %}
+                    <ul class="task-list">
+                        {% for pict in project.pictures.all %}
+                        <li>
+                            <div class="task-title">
+                                <span class="task-title-sp"><a href="{{ pict.file.url }}">{{ pict.title }} - {{ pict.file.name }}</a></span>
+                                {% if pict.file.width %}
+                                <span class="badge bg-info">{{ pict.file.width }} x {{ pict.file.height }} </span>
+                                {% endif %}
+                                <div class="pull-right hidden-phone">
+                                    <a href="{% url 'marks:deleteimg' project.id pict.id %}" class="btn btn-danger btn-xs"><i class="fa fa-trash-o "></i></a>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+
+                    </ul>
+                    {% else %}
+                    <p>No photo(s) yet.</p>
+                    {% endif %}
+                </div>
+
+                <div class="add-task-row">
+                    <form class="form-horizontal style-form" action="{% url 'marks:edit' project.id %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% if form_pict.errors %}
+                        <div class="alert alert-danger">
+                            {% for field, error in form_pict.errors.items %}
+                            <b>{{ field }} : {{ error }}</b>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <div class="form-group">
+                            <label for="inputTitle" class="col-sm-2 control-label">Title</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" maxlength="50" name="title" id="inputTitle" placeholder="A title">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputFile" class="col-sm-2 control-label">File</label>
+                            <div class="col-sm-10">
+                                <input type="file" class="form-control" name="file" id="inputFile">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-success btn-lg btn-block">Add New Photo</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div><!-- /col-md-12-->
+</div><!-- /row -->
 {% endif %}
 {% endblock %}

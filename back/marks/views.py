@@ -10,12 +10,16 @@ from .models import Project, Question, Mark, Picture
 from .forms import PictureForm, ProjectForm
 from django.core.exceptions import PermissionDenied
 
-#@login_required
+@login_required
 def index(request):
-    list = []
-    if request.user.is_authenticated():
-        list = Project.objects.all() # shared timeslot only
-    context = {'list': list}
+    l = []
+    all_list = Project.objects.all() # shared timeslot only
+    timeslots = list(set([proj.timeslot for proj in Project.objects.filter(members=request.user)]))
+    for proj in all_list:
+        if proj.timeslot in timeslots:
+            l.append(proj)
+    projects_rated = list(set([m.project for m in Mark.objects.filter(student=request.user)]))
+    context = {'list': l, 'projects_rated': projects_rated}
     return render(request, 'marks/index.html', context)
 
 @login_required
@@ -30,7 +34,6 @@ def myprojects(request):
 
 @login_required
 def detail(request, project_id):
-
     project = get_object_or_404(Project, pk=project_id)
     questions_raw = Question.objects.all()
     marks = Mark.objects.filter(student=request.user, project=project)
@@ -41,13 +44,21 @@ def detail(request, project_id):
             if q.pk == m.question.pk:
                 value = m.result
         questions.append((q, value))
-
     shared_timeslot = False
     for proj in Project.objects.filter(members=request.user):
         if not shared_timeslot and project.timeslot == proj.timeslot:
             shared_timeslot = True
     context = {'project': project, 'questions': questions, "shared_timeslot": shared_timeslot}
     return render(request, 'marks/project.html', context)
+
+@login_required
+def deleteimg(request, project_id, pict_id):
+    project = get_object_or_404(Project, pk=project_id)
+    if request.user not in project.members.all():
+        raise PermissionDenied
+    pict = get_object_or_404(Picture, pk=pict_id)
+    pict.delete()
+    return HttpResponseRedirect(reverse('marks:detail', args=(project.id,)))
 
 
 @login_required
@@ -60,10 +71,7 @@ def editsec(request, project_id):
         form = ProjectForm(request.POST, instance=project)
         if form.is_valid():
             proj = form.save()
-            #instance = Picture(file=request.FILES['file'])
-            #instance.set_title(form.title)
-            #instance.save()
-            proj.save()
+            #proj.save()
             return HttpResponseRedirect(reverse('marks:detail', args=(project.id,)))
     else:
         form = ProjectForm(instance=project)
@@ -87,22 +95,24 @@ def edit(request, project_id):
             return HttpResponseRedirect(reverse('marks:detail', args=(project.id,)))
     else:
         form = PictureForm()
-    return render(request, 'marks/edit.html', {'form': form, 'project':project})
+    return render(request, 'marks/project.html', {'form_pict': form, 'project':project})
 
 @login_required
 def mark(request, project_id):
-     # TODO: shared timeslot only
     p = get_object_or_404(Project, pk=project_id)
     if request.user in p.members.all():
+        raise PermissionDenied
+    shared_timeslot = False
+    for proj in Project.objects.filter(members=request.user):
+        if not shared_timeslot and p.timeslot == proj.timeslot:
+            shared_timeslot = True
+    if not shared_timeslot:
         raise PermissionDenied
     for key, value in request.POST.items():
         if key.startswith("question-"):
             try:
                 quest = Question.objects.get(pk=int(key[9:]))
                 ma = Mark.objects.get(student=request.user, project=p, question=quest)
-                #selected_choice = p.choice_set.get(pk=request.POST['choice'])
-            #except Question.DoesNotExist:
-            #    pass
             except Mark.DoesNotExist:
                 ma = Mark(student=request.user, project=p, question=quest)
             finally:

@@ -29,7 +29,14 @@
                     {% endfor %}
                 </ul>
                 <hr>
+                {% if not user in project.members.all %}
+                    {% if project in projects_rated %}
+                    <div class="alert alert-success"><b>Congrats, You have rate this project.</b></div>
+                    {% endif %}
                 <a href="{% url 'marks:detail' project.id %}">Rate this project <i class="fa fa-share"></i></a>
+                {% else %}
+                <a href="{% url 'marks:detail' project.id %}">Edit my project <i class="fa fa-share"></i></a>
+                {% endif %}
             </div>
         </div>
     </div>
