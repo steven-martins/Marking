@@ -3,7 +3,8 @@
 {% block content %}
 
 {% load get_range %}
-<h3><i class="fa fa-angle-right"></i> {{ project.name }}</h3>
+
+<h3><i class="fa fa-angle-right"></i> {{ project.name }} </h3>
 <div class="row mt ">
     <div class="col-md-12">
         <div class="form-panel">
@@ -86,18 +87,17 @@
                 <br>
             </div>
             <div class="panel-body">
-            {% if shared_timeslot %}
-
+                {% if shared_timeslot %}
                 <form action="{% url 'marks:grade' project.id %}" method="post">
-                {% if error_message %}
+                    {% if error_message %}
                     <div class="alert alert-danger"><b>{{ error_message }}</b></div>
-                {% endif %}
-                {% if success_message %}
-                    <div class="alert alert-success"><b>{{ done_message }}</b></div>
-                {% endif %}
-                {% for question, value in questions %}
-                <h4>{{ question.title }}</h4>
-                <p>{{  question.detail }}</p>
+                    {% endif %}
+                    {% if success_message %}
+                    <div class="alert alert-success"><b>{{ success_message }}</b></div>
+                    {% endif %}
+                    {% for question, value in questions %}
+                    <h4>{{ question.title }}</h4>
+                    <p>{{  question.detail }}</p>
                     {% csrf_token %}
                     {% for i in 10|get_range %}
                     {% if not i == 0 and not i = 5 %}
@@ -107,21 +107,59 @@
                     {% endif %}
                     {% endfor %}
                     <hr>
-                {% endfor %}
+                    {% endfor %}
                     <button type="submit" class="btn btn-primary btn-lg btn-block">Save</button>
                 </form>
-            {% else %}
-            <p>
-                You are not sharing the same timeslot with this group. So you cannot mark it.
-            </p>
-            {% endif %}
+                {% else %}
+                <p class="bg-danger">
+                    You are not sharing the same timeslot with this group. So you cannot mark it.
+                </p>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
-
-
 {% else %}
-<h4>~~Edit my project~~</h4>
+<div class="row mt ">
+    <div class="col-md-12">
+        <div class="form-panel">
+            <div class="">
+                <h3 class="mb">Edit</h3>
+                <br>
+            </div>
+            <div class="panel-body">
+                <form action="{% url 'marks:editsec' project.id %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <form class="form-horizontal">
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            {% for field, error in form.errors.items %}
+                            <b>{{ field }} : {{ error }}</b>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <div class="form-group">
+                            <label for="inputName" class="col-sm-2 control-label">Name</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="name" id="inputName" value="{{ project.name }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputDescription" class="col-sm-2 control-label">Description</label>
+                            <div class="col-sm-10">
+                                <textarea rows="10" cols="60" class="form-control" name="description"
+                                          id="inputDescription">{{ project.description }}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-primary btn-lg btn-block">Save</button>
+                            </div>
+                        </div>
+                    </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endif %}
 {% endblock %}

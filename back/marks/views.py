@@ -8,8 +8,7 @@ from django.contrib.auth import logout
 
 from .models import Project, Question, Mark, Picture
 from .forms import PictureForm, ProjectForm
-# Create your views here.
-
+from django.core.exceptions import PermissionDenied
 
 #@login_required
 def index(request):
@@ -27,7 +26,6 @@ def myprojects(request):
 
     context = {'my_projects': my_projects}
     return render(request, 'marks/myprojects.html', context)
-
 
 
 @login_required
@@ -55,24 +53,28 @@ def detail(request, project_id):
 @login_required
 def editsec(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
+    if request.user not in project.members.all():
+        raise PermissionDenied
     if request.method == 'POST':
 
-        form = ProjectForm(request.POST, request.FILES)
+        form = ProjectForm(request.POST, instance=project)
         if form.is_valid():
-            pict = form.save()
-            project.pictures.add(pict)
+            proj = form.save()
             #instance = Picture(file=request.FILES['file'])
             #instance.set_title(form.title)
             #instance.save()
+            proj.save()
             return HttpResponseRedirect(reverse('marks:detail', args=(project.id,)))
     else:
         form = ProjectForm(instance=project)
-    return render(request, 'marks/edit.html', {'form': form, 'project':project})
+    return render(request, 'marks/project.html', {'form': form, 'project':project})
 
 
 @login_required
 def edit(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
+    if request.user not in project.members.all():
+        raise PermissionDenied
     if request.method == 'POST':
 
         form = PictureForm(request.POST, request.FILES)
@@ -89,11 +91,10 @@ def edit(request, project_id):
 
 @login_required
 def mark(request, project_id):
-    #grade
-     # shared timeslot only
-     # not my project too
+     # TODO: shared timeslot only
     p = get_object_or_404(Project, pk=project_id)
-
+    if request.user in p.members.all():
+        raise PermissionDenied
     for key, value in request.POST.items():
         if key.startswith("question-"):
             try:
