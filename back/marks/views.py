@@ -19,6 +19,8 @@ def index(request):
         if proj.timeslot in timeslots:
             l.append(proj)
     projects_rated = list(set([m.project for m in Mark.objects.filter(student=request.user)]))
+    if request.user.is_staff:
+        l = all_list
     context = {'list': l, 'projects_rated': projects_rated}
     return render(request, 'marks/index.html', context)
 
