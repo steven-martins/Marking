@@ -6,13 +6,13 @@
 
 <h3><i class="fa fa-angle-right"></i> Projects to rate</h3>
 <!-- Rate the groups -->
-{% if list %}
-{% for project in list %}
+{% if my_projects %}
+{% for project in my_projects %}
 <div class="row mt ">
     <div class="col-md-12">
         <div class="form-panel">
             <div class="">
-                <h3 class="mb">{{ project.name }}</h3>
+                <h3 class="mb">{{ project.name }} <a href="{% url 'marks:detail' project.id %}"><i class="fa fa-edit"></i></a></h3>
                 <br>
             </div>
             <div class="panel-body">
@@ -29,7 +29,7 @@
                     {% endfor %}
                 </ul>
                 <hr>
-                <a href="{% url 'marks:detail' project.id %}">Rate this project <i class="fa fa-share"></i></a>
+                <a href="{% url 'marks:detail' project.id %}">Edit my project <i class="fa fa-edit"></i></a>
             </div>
         </div>
     </div>
@@ -38,6 +38,5 @@
 {% else %}
 <p>No project available.</p>
 {% endif %}
-
 
 {% endblock  %}

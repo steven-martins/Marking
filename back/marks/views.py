@@ -11,15 +11,23 @@ from .forms import PictureForm, ProjectForm
 # Create your views here.
 
 
+#@login_required
 def index(request):
     list = []
+    if request.user.is_authenticated():
+        list = Project.objects.all() # shared timeslot only
+    context = {'list': list}
+    return render(request, 'marks/index.html', context)
+
+@login_required
+def myprojects(request):
     my_projects = []
     if request.user.is_authenticated():
-        list = Project.objects.all()
         my_projects = Project.objects.filter(members=request.user)
 
-    context = {'list': list, 'my_projects': my_projects}
-    return render(request, 'marks/index.html', context)
+    context = {'my_projects': my_projects}
+    return render(request, 'marks/myprojects.html', context)
+
 
 
 @login_required
@@ -82,6 +90,8 @@ def edit(request, project_id):
 @login_required
 def mark(request, project_id):
     #grade
+     # shared timeslot only
+     # not my project too
     p = get_object_or_404(Project, pk=project_id)
 
     for key, value in request.POST.items():

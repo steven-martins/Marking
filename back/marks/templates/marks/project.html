@@ -3,45 +3,125 @@
 {% block content %}
 
 {% load get_range %}
-<h1>{{ project.name }}</h1>
-{{ project.description }}
-<h2>Members</h2>
-<ul>
-{% for member in project.members.all %}
-    <li><img src="https://cdn.local.epitech.eu/userprofil/trombiview/{{ member.username }}.jpg"><br/>{{ member.username }}</li>
-{% endfor %}
-</ul>
-<h2>Photos</h2>
-<ul>
-{% for picture in project.pictures.all %}
-    <li>{{ picture.title }}<br /> <img width="500" src="/media/{{ picture.file }}" alt="{{ picture.title }}" /></li>
-{% endfor %}
-</ul>
-{% if not user in project.members.all %}
-{% if shared_timeslot %}
-<h2>Mark the project</h2>
-{% for question, value in questions %}
-<h3>{{ question.title }}</h3>
-<p>{{  question.detail }}</p>
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-<form action="{% url 'marks:grade' project.id %}" method="post">
-{% csrf_token %}
-<div class="rate">
-    {% for i in 10|get_range %}
-    {% if not i == 0 and not i = 5 %}
-        <input type="radio" {% if value == i %}checked{% endif %} name="question-{{ question.id }}" value="{{ i }}"> {{ i }}<br>
-    {% endif %}
-    {% endfor %}
+<h3><i class="fa fa-angle-right"></i> {{ project.name }}</h3>
+<div class="row mt ">
+    <div class="col-md-12">
+        <div class="form-panel">
+            <div class="">
+                <h3 class="mb">Description</h3>
+                <br>
+            </div>
+            <div class="panel-body">
+                {{ project.description }}
+            </div>
+        </div>
+    </div>
 </div>
-{% endfor %}
-<input type="submit" value="Vote" />
-</form>
-{% else %}
-        <p>
-            You are not sharing the same timeslot with this group. So you cannot mark it.
-        </p>
+<div class="row mt ">
+    <div class="col-md-12">
+        <div class="form-panel">
+            <div class="">
+                <h3 class="mb">Members</h3>
+                <br>
+            </div>
+            <div class="panel-body">
+                <ul class="list-inline">
+                    {% for member in project.members.all %}
+                    <li><img src="https://cdn.local.epitech.eu/userprofil/trombiview/{{ member.username }}.jpg"><br/>{{ member.username }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% if project.pictures.all %}
+<div class="row mt ">
+    <div class="col-md-12">
+        <div class="form-panel">
+            <div class="">
+                <h3 class="mb">Photos</h3>
+                <br>
+            </div>
+            <div class="panel-body">
+                <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="3000">
+                    <!-- Indicators -->
+                    <ol class="carousel-indicators">
+                        {% for picture in project.pictures.all %}
+                        <li data-target="#carousel-example-generic" data-slide-to="{{forloop.counter0}}" {% if forloop.counter0 == 0 %} class="active" {% endif %}></li>
+                        {% endfor %}
+                    </ol>
+
+                    <!-- Wrapper for slides -->
+                    <div class="carousel-inner">
+                        {% for picture in project.pictures.all %}
+                        <div class="item  {% if forloop.counter0 == 0 %}active{% endif %}">
+                            <img class="img-responsive center-block" src="/media/{{ picture.file }}" alt="{{ picture.title }}" />
+                            <div class="carousel-caption">
+                                <h3>{{ picture.title }}</h3>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Controls -->
+                    <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+                        <span class="glyphicon glyphicon-chevron-left"></span>
+                    </a>
+                    <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+                        <span class="glyphicon glyphicon-chevron-right"></span>
+                    </a>
+                </div> <!-- Carousel -->
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 {% endif %}
+{% if not user in project.members.all %}
+<div class="row mt ">
+    <div class="col-md-12">
+        <div class="form-panel">
+            <div class="">
+                <h3 class="mb">Rate the project</h3>
+                <br>
+            </div>
+            <div class="panel-body">
+            {% if shared_timeslot %}
+
+                <form action="{% url 'marks:grade' project.id %}" method="post">
+                {% if error_message %}
+                    <div class="alert alert-danger"><b>{{ error_message }}</b></div>
+                {% endif %}
+                {% if success_message %}
+                    <div class="alert alert-success"><b>{{ done_message }}</b></div>
+                {% endif %}
+                {% for question, value in questions %}
+                <h4>{{ question.title }}</h4>
+                <p>{{  question.detail }}</p>
+                    {% csrf_token %}
+                    {% for i in 10|get_range %}
+                    {% if not i == 0 and not i = 5 %}
+                    <label class="checkbox-inline">
+                        <input type="radio" {% if value == i %}checked{% endif %} name="question-{{ question.id }}" value="{{ i }}"> {{ i }}
+                    </label>
+                    {% endif %}
+                    {% endfor %}
+                    <hr>
+                {% endfor %}
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Save</button>
+                </form>
+            {% else %}
+            <p>
+                You are not sharing the same timeslot with this group. So you cannot mark it.
+            </p>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
 {% else %}
-<h2>~~Edit my project~~</h2>
+<h4>~~Edit my project~~</h4>
 {% endif %}
 {% endblock %}
