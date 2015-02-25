@@ -64,10 +64,10 @@
             <!-- sidebar menu start-->
             <ul class="sidebar-menu" id="nav-accordion">
                 {% if user.is_authenticated  %}
-                <p class="centered"><a href="profile.html"><img src="https://cdn.local.epitech.eu/userprofil/trombiview/{{ user.username }}.jpg" class="img-rounded" width="60"></a></p>
+                <p class="centered"><a href="#"><img src="https://cdn.local.epitech.eu/userprofil/trombiview/{{ user.username }}.jpg" class="img-rounded" width="60"></a></p>
                 <h5 class="centered">{{ user.username }}</h5>
                 {% else %}
-                <p class="centered"><a href="profile.html"><img src="/static/img/friends/fr-05.jpg" class="img-rounded" width="60"></a></p>
+                <p class="centered"><a href="#"><img src="/static/img/friends/fr-05.jpg" class="img-rounded" width="60"></a></p>
                 <h5 class="centered">Anonymous</h5>
                 {% endif %}
                 <li class="mt active">
